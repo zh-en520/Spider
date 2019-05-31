@@ -1,0 +1,67 @@
+Day03笔记
+1、猫眼电影xpath
+   1、xpath表达式
+      * 匹配所有电影节点表达式：
+        //dl[@class="board-wrapper"]/dd
+      * 遍历每个节点对象,依次提取数据
+        电影名称 ： .//p/a/@title
+	电影主演 ： .//p[@class="star"]/text()
+	上映时间 ： .//p[@class="releasetime"]/text()
+2、链家二手房案例(xpath)
+   1、确定是否为静态网页(查看源码)
+   2、确定URL地址
+   3、xpath表达式
+     * 房源基准xpath表达式
+       //*[@id="leftContent"]/ul/li[@class="clear LOGCLICKDATA"]
+     * 遍历后继续匹配
+       房源名称 ：./div/div[2]/div/a/text()
+       房源总价 ：./div/div[4]/div[2]/div[1]/span/text()
+       房源单价 ：./div/div[4]/div[2]/div[2]/span/text()
+3、百度贴吧图片抓取(xpath)
+   1、目标 ：提取指定贴吧的所有图片和视频
+   2、思路
+      * 贴吧URL地址,下一页,URL规律
+      * 获取1页中所有帖子链接:
+        tlink_list = [帖子链接1,帖子链接2]
+      * 遍历tlink_list,对每个帖子发请求
+      * 提取1个帖子中图片链接列表
+        imglink_list = [图片链接1,图片链接2]
+      * 向图片链接发请求,wb方式保存
+   3、实现步骤
+      * URL规律
+        http://tieba.baidu.com/f?kw=??&pn=0
+      * xpath表达式
+        ** 页面中所有帖子链接：
+	  //*[@id="thread_list"]/li[@class=" j_thread_list clearfix"]/div/div[2]/div[1]/div[1]/a/@href
+	** 帖子里所有图片链接：
+	  //*[@class="d_post_content j_d_post_content  clearfix"]/img/@src
+        ** 帖子中所有视频链接
+	  //div[@class="video_src_wrapper"]/embed/@data-video
+   4、贴吧中视频反爬
+      ** 静态网页,页面中xpath可匹配内容,程序中为[],可能网站对响应做了调整,解决方法 ：保存响应内容到本地.html,查看网页结构(搜索关键字)
+4、requests.get()参数
+   1、查询参数(params)
+      * params ：字典
+      * res = requests.get(url,params=params,hea.)
+      ** 自动对params字典进行编码,然后和url拼接
+   2、代理IP之普通代理(proxies)
+      * 获取代理IP的网站
+        西刺代理、快代理、全网代理、代理精灵
+      * proxies：{'协议':'协议://IP:端口'}
+        proxies = {
+	    'http' : 'http://1.1.1.1:8888',
+	    'https': 'https://1.1.1.1:8888'
+	}
+	res = request.get(url,proxies=proxies,headers=headers)
+
+作业：
+  1、修改百度贴吧图片抓取案例,改为params参数处理
+  2、糗事百科
+     * URL：https://www.qiushibaike.com/text/
+     * 目标：用户昵称、段子内容、好笑数量、评论数量
+     * xpath表达式尝试使用：containts()
+  3、电影天堂(xpath)
+     * 匹配所有电影节点
+     * 电影名称
+     * 电影链接
+     * 下载链接(二级页面)

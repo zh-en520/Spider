@@ -1,0 +1,160 @@
+1.csv模块
+    导入模块：import csv
+    with open('xxx.csv','w') as f:
+    初始化写入对象：writer = csv.writer(f)
+    写入数据(列表)：writer.writerow([])
+
+2.处理简单反爬
+    控制爬取速度(time.sleep(1))
+    使用随机User-Agent(random.choice(user_agent))
+    使用随机ip地址
+
+3.数据持久化存储((mongodb)
+    conn = pymongo.MongoClient('',27017)
+    db = conn.库名/['库名']/[引用变量]
+    myset = db.集合名/['集合名']/[引用变量]
+    myset.insert_one({})
+
+    show dbs
+    use 库名
+    show collections
+    db.集合名.find()[.pretty()]
+    db.集合名.count()
+    db.dropDatabase()删库
+
+4.数据持久化存储(mysql)
+
+
+5.电影天堂(二级页面抓取)
+    搜索：电影天堂 - 2019年新年精品 - 点击更多
+    URL：
+        https://www.dytt8.net/html/gndy/dyzz/index.html
+    正则表达式：
+     * 一级页面正则
+       <table width="100%".*?<a href="(.*?)".*?ulink">(.*?)</a>.*?</table>
+     * 二级页面正则
+       <tbody>.*?href="(.*?)">.*?</a>
+
+
+二．第二个请求模块(requests)
+1.安装
+    linux:sudo pip3 install requests
+    windows:python -m pip install requests
+2.requests.get(url,headers={})
+    向网站发起请求，并得到响应对象
+    响应对象res属性：
+    1.encoding:指定字符编码
+      res.encoding = 'utf-8'
+    2.text:字符串
+    3.content:字节流
+    4.status_code:HTTP响应码
+    5.url:返回实际数据的url地址
+
+
+三．xpath解析
+1.在XML文档中查找信息的语言，同样适用于HTML文档
+2、xpath辅助工具
+     * Chrome插件 ：Xpath Helper
+       Ctrl + Shift + x
+     * Firefox插件：Xpath Checker
+3、Chrome浏览器安装插件
+     * 方法1
+       1.浏览器右上角-更多工具-扩展程序-开发者模式
+       2.把下载好的对应版本的插件拖拽到浏览器页面
+     * 方法2
+       1.把.crx文件命名为.rar,并解压
+       2.浏览器:加载已解压的扩展程序-选中解压文件夹
+       3.重启浏览器
+4、xpath表达式
+  1、匹配演示
+     * 查找所有的book节点 : //book
+     * 查找book节点下的title子节点中,lang属性为'en'的节点
+       //book/title[@lang="en"]
+       ** 只要涉及到条件,加 []
+       ** 只要获取属性值,加 @
+     * 查找book节点下所有title节点的,lang属性的值
+       //book//title/@lang
+  2、选取节点
+     * // ：所有节点查找
+     * @  ：获取属性值
+            条件 ： //div[@class="movie"]
+	    取值 ： //div/a/@src
+     * |  ：匹配多路径
+            xpath表达式1 | xpath表达式2
+     * contains() ：匹配属性值中包含某些字符串节点
+       //div[contains(@id,"qiushi_tag_")]
+       查找id属性值中包含"qiushi_tag_"的div节点
+     * text() ：获取节点的文本内容
+       //book/title/text()
+9、lxml解析库
+   1、安装 ：sudo pip3 install lxml
+   2、使用流程
+      * 导模块：from lxml import etree
+      * 创建解析对象
+        parse_html = etree.HTML(html)
+      * 对象调用方法
+        r_list = parse_html.xpath('xpath表达式')
+
+作业：
+  1、把之前的代码,全部使用requests模块实现
+  2、用xpath爬取猫眼电影信息,并存入数据库
+     * 找到10个电影节点对象列表：
+       //div[@class="movie-item-info"]
+     * for循环遍历每个节点对象
+       (任何1个节点对象都可以调用xpath)
+       name = div节点对象.xpath('./p/a/@href')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

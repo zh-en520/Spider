@@ -1,0 +1,184 @@
+Day02回顾
+1、链家二手房xpath
+   * 响应内容中做了处理,查看响应内容写xpath
+     li节点： //li[@class="clear LOGCLICKDATA"]
+     房源名称： .//div[@class="houseInfo"]/a/text()
+     房源总价： .//div[@class="totalPrice"]/span/text()
+     房源单价： .//div[@class="unitPrice"]/span/text()
+2、requests.get()参数
+   1、查询参数 ：params -> {}
+   2、代理参数 ：proxies -> {}
+      {'协议':'协议://IP:端口号'}
+      proxies = {
+          'http':'http://1.1.1.1:8888',
+	  'https':'https://1.1.1.1:8888'
+      }
+******************************************
+Day04笔记
+1、代理IP之私密代理(proxies)
+   * proxies = {'协议':'协议://用户名:密码@IP:端口号'}
+2、Web客户端验证(auth)
+   * 格式 ：auth=('用户名','密码')
+            auth=('tarenacode','code_2013')
+   * code爬取
+     xpath表达式：/html/body/pre/a/text()
+3、SSL证书认证(verify)
+   * SSLError ：verify=False
+   * verify=True(默认) : 检查SSL证书认证
+   * verify=False ：不检查证书
+   * res = requests.get(url,headers=headers,verify=False)
+4、requests.post(url,data=data)
+   * data : 字典{},Form表单数据
+   * GET请求 ：查询参数在URL地址上
+   * POST请求：查询参数在Form表单里
+5、自制翻译器(破解有道翻译)
+   1、F12抓包,Network-All,找POST地址和Form表单数据
+      * POST地址 ：Request URL地址
+      * Form表单 ：Form Data
+        发现Form表单中有一些值在变
+        ** salt: 15591863392025
+        ** sign: b282ce20528bd1f7c4e6916c35573154
+        ** ts: 1559186339202
+        ** bv: 9d1e6a4f9d4241fb7947f623cc9e4efa
+   2、一般为JS文件加密,找到相关JS文件,查找加密算法
+      * 抓包右上角 - Search - salt(关键字) - 找到相关JS文件 - 点击{}格式化输出
+      * fanyi.min.js
+   3、打开JS文件,分析加密算法(console中可执行JS)
+      * ts(获取时间戳)
+        1、js实现："" + (new Date).getTime()
+	2、python实现：str(int(time.time()*1000))
+      * bv(对User-Agent中Mozilla之后的值进行加密)
+        1、js实现：n.md5(navigator.appVersion)
+	2、python：对User-Agent中 '5.0/xxxx'
+	   from hashlib import md5
+	   s = md5()
+	   s.update('字符串'.encode())
+	   r = s.hexdigest()
+      * salt
+	js实现："" + (new Date).getTime() + parseInt(10 * Math.random(), 10)
+	        13位时间戳(字符串)+str(0-9随机数)
+	python：str(int(time.time()*1000)) + str(random.randint(0,9))
+      * sign
+        ** js实现："fanyideskweb" + e + i + "@6f#X3=cCuncYssPsuRUE"
+	** 断点调试,e为要翻译的单词
+        ** python：对"fanyideskweb" + 要翻译的单词 + salt + "@6f#X3=cCuncYssPsuRUE" 进行md5加密
+6、正则处理headers和formdata
+   1、pycharm ：Ctrl + r
+   2、处理headers和formdata
+      (.*?): (.*)
+      "$1": "$2",
+7、cookie模拟登录(抓取需要登录才能访问的页面)
+   1、先登录成功1次,抓取cookie
+      F12开启抓包,输入用户名、密码,登录成功,找到home(一般在抓到地址的上面)
+   2、携带着cookie发请求
+      ** Cookie
+      ** Referer(源,代表你从哪里转过来的)
+      ** User-Agent
+8、cookie模拟登录(方法2)
+   * 利用session会话保持
+   1、使用步骤
+      * 实例化session对象
+        session = requests.session()
+      * 让session对象发送get或者post请求
+        res = session.get(url,headers=headers)
+   2、寻找登录时POST的地址
+      * 查看网页源码,查看form,找action对应的地址
+        http://www.renren.com/PLogin.do
+      * 发送用户名和密码信息到POST的地址
+        -- 用户名和密码信息为字典
+	   键 ：<input>标签中name的值(email,pass.)
+	   值 ：真实的用户名和密码
+	post_data = {'email':'','password':''}
+   3、程序实现
+      * 先post
+      * 再get个人主页
+9、Ajax动态加载数据抓取
+   1、特点 ：滚动鼠标、页面局部刷新
+   2、F12 ：找json文件的地址
+10、豆瓣电影信息抓取
+   1、网址 ：豆瓣电影 - 排行榜 - 剧情
+   2、目标 ：电影名称、评分
+   3、抓取步骤
+      * F12抓包
+        Request URL：https://movie.douban.com/j/chart/top_list?type=11&interval_id=100%3A90&action=&start=0&limit={}
+
+      * 查询参数
+	type: 11
+	interval_id: 100:90
+	action: 
+	start: 60
+	limit: 20
+
+
+
+
+
+
+
+
+作业：
+  1、仔细复习有道翻译案例,抓包流程,代码实现
+  2、百度翻译流程
+     * 找到POST地址和Form表单数据
+     * 找到相关的JS文件的相关的JS代码
+     * 分析JS代码
+  3、豆瓣电影案例升级
+     * 输入电影类型,再输入数量 (剧情、喜剧、爱情)
+  4、抓取腾讯招聘职位信息
+  5、抓取腾讯招聘二级页面信息(工作职责、要求)
+  
+
+
+
+
+
+
+
+
+
+
+var r = function(e) {
+var t = n.md5(navigator.appVersion)
+  , r = "" + (new Date).getTime()
+  , i = r + parseInt(10 * Math.random(), 10);
+return {
+    ts: r,
+    bv: t,
+    salt: i,
+    sign: n.md5("fanyideskweb" + e + i + "@6f#X3=cCuncYssPsuRUE")
+}
+};
+
+
+
+
+
+
+res = requests.post(url,data=data,headers=headers)
+res.encoding='utf-8'
+提取翻译后的结果
+
+第1次：
+
+salt: 15591863392025
+sign: b282ce20528bd1f7c4e6916c35573154
+ts: 1559186339202
+bv: 9d1e6a4f9d4241fb7947f623cc9e4efa
+
+**************************
+第2次：
+
+salt: 15591863498748
+sign: ebb4c3af63ca3e7695b5da3570c3bd2e
+ts: 1559186349874
+bv: 9d1e6a4f9d4241fb7947f623cc9e4efa
+
+
+
+
+
+
+
+
+
+

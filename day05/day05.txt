@@ -1,0 +1,174 @@
+Day04回顾
+1、cookie模拟登陆
+   1、方法1 ：先登录成功1次抓取cookie,添加到headers
+   2、方法2
+      * 查看网页源码,找到form中action对应的URL地址
+      * data,查找<input>节点,定义字典 ：name的值作为键,用户名和密码作为值
+      * session = requests.session()
+      * session.post(action_url,data=data)
+      * res = session.get(url)
+2、lxml使用流程
+   * from lxml import etree
+   * parse_html = etree.HTML(res.text)
+   * r_list = parse_html.xpath('xpath表达式')
+3、xpath匹配规则
+   * 节点对象列表 ： //div[@class="tiger"]
+   * 字符串列表:     //div[@class="t"]/@href
+                     //div[@class="t"]/text()
+   * 函数 ：//div[contains(@id,"tiger")]//a/@href
+4、xpath高级
+   * 基准xpath表达式(节点对象列表)
+   * for r in [节点对象列表]:
+         username = r.xpath('.//')
+5、Ajax动态加载
+   * 特点 ：滚动鼠标滑轮加载,页面局部刷新
+   * F12/抓包工具 ：URL地址 + Query String
+**********************************************
+Day05笔记
+1、豆瓣电影(Ajax)数据抓取
+   1、网址 ：豆瓣电影 - 排行榜 - 剧情
+   2、目标 ：电影名称、评分
+   3、步骤
+      * F12抓包,抓2个数据
+        ** Request URL ：GET的URL地址
+	** Query String：查询参数
+   4、查询参数 和 URL地址
+      type: 24
+      interval_id: 100:90
+      action: 
+      start: 20
+      limit: 20
+
+      https://movie.douban.com/j/chart/top_list?
+2、Fiddler抓包工具
+   1、配置Fiddler
+      * Tools - Options - HTTPS(添加证书信任)
+        * Decrypt Https Traffic(选中,出现窗口)
+	* ...from browsers only
+      * Tools - Options - Connections
+        * 监听端口 ：8888
+      * 重启Fiddler(重要)
+   2、配置浏览器代理
+      * 安装Proxy SwitchOmega插件
+      * 浏览器右上角：SwitchOmega->选项->新建情景模式->AID1812(名字)->创建
+      * 输入 ：HTTP://  127.0.0.1  8888
+      * 点击 ：应用选项
+      * 点击右上角SwitchOmega可切换代理
+3、Fiddler常用菜单
+   1、Inspector ：查看数据包详细内容
+      整体分为请求和响应两部分
+   2、常用菜单
+      * Headers ：请求头信息
+      * WebForms
+        POST请求Form表单数据 ：<body>
+	GET请求查询参数      ：<QueryString>
+      * Raw
+        将整个请求显示为纯文本
+4、腾讯招聘案例
+  1、打开腾讯招聘 - 查看工作岗位 - 右键查看源代码(啊,啥都没有)
+  2、找到请求的地址(json) ：F12 - XHR - Preview
+  3、找到了一级页面URL地址和查询参数
+     url = 'https://careers.tencent.com/tencentcareer/api/post/Query?timestamp=1557114143837&countryId=&cityId=&bgIds=&productId=&categoryId=&parentCategoryId=&attrId=&keyword=&pageIndex=%s&pageSize=10&language=zh-cn&area=cn' % str(index)
+  4、同理,获取二级页面工作职责和岗位要求
+     two_url = 'https://careers.tencent.com/tencentcareer/api/post/ByPostId?timestamp=1557122746678&postId=%s&language=zh-cn' % postid
+     ** postid在一级页面的响应中可以拿到
+5、selenium+phantomjs/Chrome
+   1、selenium
+      * Web自动化测试工具
+      * 可运行在浏览器,根据指定命令操作浏览器
+      * 只是工具,必须与第三方浏览器结合使用
+      * 安装 ：sudo pip3 install selenium
+   2、phantomjs浏览器
+      * 无界面浏览器(无头浏览器)
+      * 在内存中进行页面加载,高效
+      * 安装
+        windows ：下载对应安装包,将文件放到python安装目录的Scripts目录下
+	Linux   ：下载,解压到任意路径
+   3、chromedriver安装
+      * 下载地址 ：http://chromedriver.storage.googleapis.com/index.html
+      * 安装
+        1、查看本机Chrome浏览器版本(设置-帮助-关于Google Chrome)
+	2、下载对应版本的chromedriver
+	3、拷贝到python安装目录的Scripts目录下
+6、常用方法
+   1、浏览器对象常用方法及属性
+      * driver = webdriver.PhantomJS()
+      * driver.get(url)
+      * driver.page_source ：查看源码
+      * driver.page_source.find('字符串')
+          作用 ：从html源码中搜索指定字符串
+	  ** -1 ：没找到
+      * driver.close() ：关闭当前页
+      * driver.quit()  ：关闭浏览器
+   2、定位节点
+      1、单元素查找(1个节点对象)
+         * driver.find_element_by_id('').text
+	 * driver.find_element_by_name('')
+	 * driver.find_element_by_class_name('')
+	 * driver.find_element_by_xpath('xpath')
+      2、多元素查找(节点对象列表)
+         * driver.find_elements_by_xxxxxxx('')
+	   for ele in [节点对象列表]:
+	       print(ele.text)
+   3、节点对象操作
+      * ele.send_keys('') ：搜索框赋值
+      * ele.click() 
+      * ele.text          ：获取文本内容
+      * ele.get_attribute('href') ：获取属性值
+   4、iframe如何切换
+      * iframe = driver.find_element_by_xxx('')
+      * driver.switch_to_frame(节点对象)
+7、京东商品抓取
+  1、网址 ：https://www.jd.com/
+  2、目标 ：终端输入 ：爬虫书籍,爬取内容如下：
+     * 名称
+     * 价格
+     * 评论
+     * 商家
+  3、思路
+     * 跳到商品页后,提取所有商品节点对象列表
+     * 把每个商品节点对象的文本内容打印 .text
+       观察规律,想办法做处理
+     * 注意使用time.sleep()
+
+     * 下一页：driver.page_source.find('') == -1:
+                    xxx   xxx
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     
+
+
+C:\Users\python\AppData\Local\Programs\Python\Python37
+
+
+
+
+
+
+
+
+
+
+
+
+
+

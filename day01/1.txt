@@ -1,0 +1,133 @@
+爬虫：
+一．概述
+１．目的：
+    获取大量数据做分析；
+    做公司项目的测试数据；
+２．企业获取数据的方式
+    公司自有数据；
+    第三方数据平台购买；数据堂，贵阳大交易所
+    爬虫爬取数据；
+３．Python做爬虫的优势
+    请求模块，解析模块丰富，强大的网络爬虫框架
+    PHP:对多线程，异步支持不好；
+    Java:代码笨重，代码量大；
+    C/C++:运行效率高，开发效率低(技术需求高)，代码成型慢;
+４．爬虫的分类
+    通用网络爬虫(搜索引擎)：
+    需要遵守的协议：Robots机器人协议；
+    查看协议内容：IP/域名/端口/robots.txt
+    定义：网络通过robots协议告诉引擎哪些页面可抓，哪些页面不可抓(君子协议)
+    反爬软件：Ngix,阿帕奇
+
+    聚焦网络爬虫：自己写的程序
+５．爬取数据步骤
+    确定要爬取的URL地址；
+    发请求，得到响应内容；
+    解析提取数据；
+    保存数据(本地文件，数据库)；
+
+二．请求模块(urllib.request)
+１．urllib.request.urlopen(url地址)
+    作用：向url发请求，并得到响应
+    方式：
+    字节流　＝　r.read().decode('utf-8')
+    encode():字符串　－－＞　bytes
+    decode():bytes　－－＞　字符串
+    测试网站：http://httpbin.org/get
+    默认User-Agent:Python-urllib/3.5xxx
+    重构User-Agent应对反爬，但urlopen()不支持
+２．urllib.request.Request(url,headers={})
+    作用：构造一个请求对象(并没有发送请求)
+    三步走：from urllib import request
+        构建请求对象
+        获取响应对象
+        获取响应内容
+三．编码模块(urllib.parse)
+１．urlencode({})
+    import urllib.parse
+    param = urllib.parse.urlencode({'wd':'美女'})
+    url = 'https://www.baidu.com/s?wd='+param
+    url = 'https://www.baidu.com/s?wd=wd=%E7%BE%8E%E5%A5%B3'
+
+    In [5]: d = {'wd':'美女','pn':'10'}
+
+    In [6]: params = urllib.parse.urlencode(d)
+
+    In [7]: params
+    Out[7]: 'wd=%E7%BE%8E%E5%A5%B3&pn=10'
+
+    In [8]: url = 'http://www.baidu.com/s?'+params
+
+    In [9]: url
+    Out[9]: 'http://www.baidu.com/s?wd=%E7%BE%8E%E5%A5%B3&pn=10'
+
+2.拼接url地址方式
+    字符串＋字符串
+    '字符串%s'%'字符串'
+    '字符串{}'.format('字符串')
+3.quote('字符串')
+    对字符串进行编码
+4.unquote('%E8xxx')
+    对字符串进行解码
+
+5.python2 和 python3中urllib关系
+    １．python2:
+    urllib :编码
+    urllib2:发请求
+    ２．python3(合并)
+    urllib.parse:编码
+    urllib.request:发请求
+案例：
+    百度贴吧数据抓取
+
+四．re正则解析
+１．使用流程
+    --r_list = re.findall('',html)
+    --p = re.compile('',re.S)
+      r_list = p.findall(html)
+2.分组
+    网页中，想要匹配什么内容，就加()
+    ２个以上分组，先整体匹配，然后匹配()中的[(),(),(),()]
+
+作业：
+１．抓取１０页信息，并保存进文件
+２．重写百度贴吧案例
+３．抓取链家信息
+４．pymysql,pymongo,Mysql和mongodn基本命令
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

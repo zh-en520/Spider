@@ -1,0 +1,86 @@
+import requests
+import json
+import pymysql
+
+class DoubanSpider(object):
+    def __init__(self):
+        self.url = 'https://movie.douban.com/j/chart/top_list?'
+        self.headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36'}
+
+    # 获取页面
+    def get_page(self,params):
+        res = requests.get(
+            url=self.url,
+            params=params,
+            headers=self.headers,
+            verify=True
+        )
+        res.encoding = 'utf-8'
+        # json.loads() josn格式->Python格式
+        html = json.loads(res.text)
+        self.parse_page(html)
+
+    # 解析并保存数据
+    def parse_page(self,html):
+        # html为大列表 [{电影1信息},{},{}]
+        for h in html:
+            # 名称
+            name = h['title'].strip()
+            # 评分
+            score = float(h['score'].strip())
+            # 打印测试
+            print([name,score])
+
+    # 主函数
+    def main(self):
+        # 输入电影类型(剧情|喜剧|爱情)
+        # 剧情 : 11  喜剧 : 24  爱情 : 13
+
+        kinds = ['剧情','喜剧','爱情']
+        ty_dict = {
+            '剧情' : '11',
+            '喜剧' : '24',
+            '爱情' : '13'
+        }
+        ty = input('请输入电影类型(剧情|喜剧|爱情):')
+        if ty in kinds:
+            limit = input('请输入电影数量:')
+            params = {
+                'type' : ty_dict[ty],
+                'interval_id' : '100:90',
+                'action' : '',
+                'start' : '0',
+                'limit' : limit
+            }
+            # 调用函数,传递params参数
+            self.get_page(params)
+        else:
+            print('类型不存在!')
+
+if __name__ == '__main__':
+    spider = DoubanSpider()
+    spider.main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
